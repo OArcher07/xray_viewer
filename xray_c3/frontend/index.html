@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Ray Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>X-Ray Viewer</h1>
+        </header>
+        <main class="content">
+            <section class="patient-selector">
+                <label for="patient-select">Select Patient:</label>
+                <select id="patient-select">
+                    <option value="">-- Select a patient --</option>
+                </select>
+            </section>
+            <section class="x-ray-display">
+                <div class="image-controls">
+                    <button id="zoomIn" class="btn">Zoom In</button>
+                    <button id="zoomOut" class="btn">Zoom Out</button>
+                    <button id="reset" class="btn">Reset</button>
+                    <button id="annotate" class="btn btn-annotate">Annotate</button>
+                </div>
+                <div class="x-ray-image" id="xrayContainer">
+                    <img id="xrayImage" src="" alt="X-Ray Image">
+                </div>
+            </section>
+            <aside class="patient-info">
+                <h2>Patient Information</h2>
+                <p><strong>Name:</strong> <span id="patient-name"></span></p>
+                <p><strong>Date of Birth:</strong> <span id="patient-dob"></span></p>
+                <p><strong>Gender:</strong> <span id="patient-gender"></span></p>
+                <p><strong>Medical History:</strong> <span id="patient-medical-history"></span></p>
+                
+                <h2>Image Controls</h2>
+                <div class="slider-control">
+                    <label for="contrast">Contrast: <span id="contrast-value">100%</span></label>
+                    <input type="range" id="contrast" min="0" max="200" value="100">
+                </div>
+                <div class="slider-control">
+                    <label for="brightness">Brightness: <span id="brightness-value">100%</span></label>
+                    <input type="range" id="brightness" min="0" max="200" value="100">
+                </div>
+            </aside>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
