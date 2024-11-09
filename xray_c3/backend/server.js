@@ -5,7 +5,7 @@ const multer = require("multer");
 const upload = multer();
 
 const app = express();
-const port = 3000;
+const port = 5432;
 
 app.use(cors());
 app.use(express.json());
