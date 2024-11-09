@@ -10,8 +10,8 @@
   
   <?php
   // Database connection variables
-  $host = 'localhost';
-  $db = 'cdc';
+  $host = '10.0.150.227';
+  $db = 'postgres';
   $user = 'postgres';
   $pass = 'cdc';
   
