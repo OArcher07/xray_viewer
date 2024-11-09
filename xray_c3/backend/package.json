@@ -14,7 +14,7 @@
     "medical",
     "imaging"
   ],
-  "author": "Your Name",
+  "author": "oarcher",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
