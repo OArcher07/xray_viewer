@@ -23,7 +23,7 @@ const createTableQuery = `
     dob DATE NOT NULL,
     gender VARCHAR(50) NOT NULL,
     medical_history TEXT,
-    xray_image BYTEA,
+    xray_image_path BYTEA,
     CONSTRAINT patient_unique UNIQUE (name, dob)
   )
 `;
