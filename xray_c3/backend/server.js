@@ -135,5 +135,5 @@ app.post("/api/patients", upload.single("xrayImage"), async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running at http://10.0.150.227:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
