@@ -11,9 +11,9 @@
   <?php
   // Database connection variables
   $host = 'localhost';
-  $db = 'jan';
-  $user = 'jan';
-  $pass = '';
+  $db = 'cdc';
+  $user = 'postgres';
+  $pass = 'cdc';
   
   // Process form submission
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
