@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
   async function fetchPatientList() {
     console.log("PATIENT HERE");
     try {
-      const response = await fetch("http://localhost:3000/api/patients");
+      const response = await fetch("http://10.0.150.227:5432/api/patients");
       if (!response.ok) {
         throw new Error("Failed to fetch patient list");
       }
