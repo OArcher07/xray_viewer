@@ -13,7 +13,7 @@ app.use(express.json());
 // Create PostgreSQL connection pool
 const pool = new Pool({
   connectionString:
-    process.env.DATABASE_URL || "postgresql://postgres:cdc@10.0.150.227:5432/cdc",
+    process.env.DATABASE_URL || "postgresql://postgres:cdc@10.0.150.227:5432/postgres",
 });
 
 // Create patients table if it doesn't exist
