@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Fetch a random X-ray image for the patient
-  async function fetchRandomXrayImage(name, dob) {
+   async function fetchRandomXrayImage(name, dob) {
     try {
       const response = await fetch(
         `http://localhost:3000/api/patients/${encodeURIComponent(name)}/${encodeURIComponent(dob)}/random-xray`
