@@ -66,27 +66,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Fetch X-ray image
-  async function fetchXrayImage(name, dob) {
-    console.log("HERE");
+  // Fetch X-ray image by patient name
+  async function fetchXrayImage(name) {
+    console.log("Fetching X-ray image for:", name);
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/patients/${encodeURIComponent(
-          name
-        )}/${encodeURIComponent(dob)}/xray`
-      );
-      if (!response.ok) {
-        throw new Error("X-ray image not found");
-      }
+        // Construct the file path using the patient's name, assuming the images are stored in 'uploads' folder
+        const imagePath = `uploads/${name}_xray.jpg`; // Adjust the path and naming convention if needed
 
-      console.log("RESPONSE ", response);
-      //   const blob = await response.blob();
-      //   const imageUrl = URL.createObjectURL(blob);
-      const imagePath = await response.text();
-      xrayImage.src = imagePath;
+        // Check if the file exists (optional if you're just testing or not doing server-side checks)
+        const response = await fetch(imagePath);
+
+        if (!response.ok) {
+            throw new Error("X-ray image not found");
+        }
+
+        // Set the image source to the path of the X-ray image
+        xrayImage.src = imagePath;
     } catch (error) {
-      console.error("Error fetching X-ray image:", error);
+        console.error("Error fetching X-ray image:", error);
     }
   }
 
