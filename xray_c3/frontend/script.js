@@ -12,9 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const patientNameElement = document.getElementById("patient-name");
   const patientDobElement = document.getElementById("patient-dob");
   const patientGenderElement = document.getElementById("patient-gender");
-  const patientMedicalHistoryElement = document.getElementById(
-    "patient-medical-history"
-  );
+  const patientMedicalHistoryElement = document.getElementById("patient-medical-history");
   const patientSelect = document.getElementById("patient-select");
 
   let scale = 1;
@@ -22,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Fetch list of patients
   async function fetchPatientList() {
-    console.log("Fetching Patient List...");
     try {
       const response = await fetch("http://localhost:3000/api/patients");
       if (!response.ok) {
@@ -40,9 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
     patients.forEach((patient) => {
       const option = document.createElement("option");
       option.value = `${patient.name}|${patient.dob}`;
-      option.textContent = `${patient.name} (DOB: ${new Date(
-        patient.dob
-      ).toLocaleDateString()})`;
+      option.textContent = `${patient.name} (DOB: ${new Date(patient.dob).toLocaleDateString()})`;
       patientSelect.appendChild(option);
     });
   }
@@ -51,29 +46,24 @@ document.addEventListener("DOMContentLoaded", function () {
   async function fetchPatientData(name, dob) {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/patients/${encodeURIComponent(
-          name
-        )}/${encodeURIComponent(dob)}`
+        `http://localhost:3000/api/patients/${encodeURIComponent(name)}/${encodeURIComponent(dob)}`
       );
       if (!response.ok) {
         throw new Error("Patient not found");
       }
       const patientData = await response.json();
       updatePatientInfo(patientData);
-      fetchXrayImage(name, dob);
+      fetchRandomXrayImage(name, dob);  // Fetch random X-ray image
     } catch (error) {
       console.error("Error fetching patient data:", error);
     }
   }
 
-  // Fetch X-ray image by patient name and dob
-  async function fetchXrayImage(name, dob) {
-    console.log("Fetching X-ray image for:", name, dob);
-
+  // Fetch a random X-ray image for the patient
+  async function fetchRandomXrayImage(name, dob) {
     try {
-      // Construct the path based on patient data from the backend
       const response = await fetch(
-        `http://localhost:3000/api/patients/${encodeURIComponent(name)}/${encodeURIComponent(dob)}/xray`
+        `http://localhost:3000/api/patients/${encodeURIComponent(name)}/${encodeURIComponent(dob)}/random-xray`
       );
 
       if (!response.ok) {
@@ -81,24 +71,20 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const data = await response.json();
-      const imagePath = data.xray_image_path; // Assuming the backend returns the image path
+      const imagePath = data.imagePath;
 
-      // Set the image source to the path of the X-ray image
-      xrayImage.src = `http://localhost:3000/${imagePath}`;
+      // Set the image source to the random image path
+      xrayImage.src = imagePath;
     } catch (error) {
-      console.error("Error fetching X-ray image:", error);
+      console.error("Error fetching random X-ray image:", error);
     }
   }
 
-  // Update patient info displayed on the page
   function updatePatientInfo(patientData) {
     patientNameElement.textContent = patientData.name;
-    patientDobElement.textContent = new Date(
-      patientData.dob
-    ).toLocaleDateString();
+    patientDobElement.textContent = new Date(patientData.dob).toLocaleDateString();
     patientGenderElement.textContent = patientData.gender;
-    patientMedicalHistoryElement.textContent =
-      patientData.medical_history || "No medical history available";
+    patientMedicalHistoryElement.textContent = patientData.medical_history || "No medical history available";
   }
 
   // Handle patient selection
@@ -172,7 +158,6 @@ document.addEventListener("DOMContentLoaded", function () {
       annotation.style.width = "10px";
       annotation.style.height = "10px";
       annotation.style.backgroundColor = "red";
-      xrayContainer.appendChild(annotation);
     }
   });
 });
