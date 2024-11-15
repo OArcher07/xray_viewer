@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Fetch list of patients
   async function fetchPatientList() {
-    console.log("PATIENT HERE");
+    console.log("Fetching Patient List...");
     try {
       const response = await fetch("http://localhost:3000/api/patients");
       if (!response.ok) {
@@ -66,28 +66,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Fetch X-ray image by patient name
-  async function fetchXrayImage(name) {
-    console.log("Fetching X-ray image for:", name);
+  // Fetch X-ray image by patient name and dob
+  async function fetchXrayImage(name, dob) {
+    console.log("Fetching X-ray image for:", name, dob);
 
     try {
-        // Construct the file path using the patient's name, assuming the images are stored in 'uploads' folder
-        const imagePath = `uploads/${name}_xray.jpg`; // Adjust the path and naming convention if needed
+      // Construct the path based on patient data from the backend
+      const response = await fetch(
+        `http://localhost:3000/api/patients/${encodeURIComponent(name)}/${encodeURIComponent(dob)}/xray`
+      );
 
-        // Check if the file exists (optional if you're just testing or not doing server-side checks)
-        const response = await fetch(imagePath);
+      if (!response.ok) {
+        throw new Error("X-ray image not found");
+      }
 
-        if (!response.ok) {
-            throw new Error("X-ray image not found");
-        }
+      const data = await response.json();
+      const imagePath = data.xray_image_path; // Assuming the backend returns the image path
 
-        // Set the image source to the path of the X-ray image
-        xrayImage.src = imagePath;
+      // Set the image source to the path of the X-ray image
+      xrayImage.src = `http://localhost:3000/${imagePath}`;
     } catch (error) {
-        console.error("Error fetching X-ray image:", error);
+      console.error("Error fetching X-ray image:", error);
     }
   }
 
+  // Update patient info displayed on the page
   function updatePatientInfo(patientData) {
     patientNameElement.textContent = patientData.name;
     patientDobElement.textContent = new Date(
@@ -169,6 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
       annotation.style.width = "10px";
       annotation.style.height = "10px";
       annotation.style.backgroundColor = "red";
+      xrayContainer.appendChild(annotation);
     }
   });
 });
