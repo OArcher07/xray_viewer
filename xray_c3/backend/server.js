@@ -1,63 +1,25 @@
 const express = require("express");
 const { Pool } = require("pg");
 const cors = require("cors");
-const multer = require("multer");
-const path = require("path");
 const fs = require("fs");
-const upload = multer({ dest: "uploads/" }); // Store images in the 'uploads/' folder
+const path = require("path");
 
 const app = express();
 const port = 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Serve static files from 'uploads/'
 
+// Create PostgreSQL connection pool
 const pool = new Pool({
   connectionString:
     process.env.DATABASE_URL || "postgresql://postgres:cdc@10.0.150.227:5432/postgres",
 });
 
-// Create patients table if it doesn't exist
-const createTableQuery = `
-  CREATE TABLE IF NOT EXISTS patients (
-    name VARCHAR(255) NOT NULL,
-    dob DATE NOT NULL,
-    gender VARCHAR(50) NOT NULL,
-    medical_history TEXT,
-    xray_image_path VARCHAR(255),  // Changed to store image path, not BYTEA
-    CONSTRAINT patient_unique UNIQUE (name, dob)
-  )
-`;
-
-pool
-  .query(createTableQuery)
-  .then(() => console.log("Patients table created or already exists"))
-  .catch((err) => console.error("Error creating patients table:", err));
-
 // API routes
 app.get("/api/patients", async (req, res) => {
   try {
-    const { name, dob } = req.query;
-    let query = "SELECT name, dob FROM patients";
-    const params = [];
-    const conditions = [];
-
-    if (name) {
-      conditions.push("name = $1");
-      params.push(name);
-    }
-
-    if (dob) {
-      conditions.push("dob = $" + (params.length + 1));
-      params.push(dob);
-    }
-
-    if (conditions.length > 0) {
-      query += " WHERE " + conditions.join(" AND ");
-    }
-
-    const result = await pool.query(query, params);
+    const result = await pool.query("SELECT name, dob FROM patients");
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching patients:", err);
@@ -83,51 +45,44 @@ app.get("/api/patients/:name/:dob", async (req, res) => {
   }
 });
 
-// Serve the X-ray image as a static file
-app.get("/api/patients/:name/:dob/xray", async (req, res) => {
+// Fetch a random image for a patient
+app.get("/api/patients/:name/:dob/random-xray", async (req, res) => {
+  const { name, dob } = req.params;
+  
   try {
-    const { name, dob } = req.params;
-    const result = await pool.query(
-      "SELECT xray_image_path FROM patients WHERE name = $1 AND dob = $2",
-      [name, dob]
-    );
-    if (result.rows.length === 0 || !result.rows[0].xray_image_path) {
-      res.status(404).json({ message: "X-ray image not found" });
-    } else {
-      const imagePath = result.rows[0].xray_image_path;
-      res.sendFile(path.join(__dirname, imagePath)); // Send the X-ray image file
-    }
-  } catch (err) {
-    console.error("Error fetching X-ray:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
+    // Path to the uploads folder
+    const uploadsPath = path.join(__dirname, "uploads");
+    
+    // Read the contents of the uploads folder
+    fs.readdir(uploadsPath, (err, files) => {
+      if (err) {
+        console.error("Error reading uploads folder:", err);
+        return res.status(500).json({ message: "Server error" });
+      }
 
-// API to upload a new patient's data along with the X-ray image
-app.post("/api/patients", upload.single("xrayImage"), async (req, res) => {
-  const { name, dob, gender, medicalHistory } = req.body;
-  const xrayImage = req.file;
+      // Filter the files to include only images (you can adjust extensions as needed)
+      const imageFiles = files.filter(file =>
+        /\.(jpg|jpeg|png|gif)$/i.test(file)
+      );
 
-  try {
-    // Define a unique filename for the image
-    const xrayImagePath = `uploads/${xrayImage.filename}`;
+      if (imageFiles.length === 0) {
+        return res.status(404).json({ message: "No images found" });
+      }
 
-    // Store the patient data with the path to the X-ray image
-    const result = await pool.query(
-      "INSERT INTO patients (name, dob, gender, medical_history, xray_image_path) VALUES ($1, $2, $3, $4, $5) RETURNING name, dob",
-      [name, dob, gender, medicalHistory, xrayImagePath]
-    );
+      // Select a random image from the available files
+      const randomImage = imageFiles[Math.floor(Math.random() * imageFiles.length)];
 
-    res.status(201).json({
-      message: "Patient created successfully",
-      name: result.rows[0].name,
-      dob: result.rows[0].dob,
+      // Send the path of the random image
+      res.json({ imagePath: `/uploads/${randomImage}` });
     });
   } catch (err) {
-    console.error("Error creating patient:", err);
+    console.error("Error fetching random X-ray:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// Serve images from the uploads folder statically
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
